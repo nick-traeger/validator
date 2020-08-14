@@ -15,6 +15,7 @@ ADD https://github.com/validator/validator/releases/download/linux/vnu.linux.zip
 ADD https://github.com/validator/validator/releases/download/linux/vnu.linux.zip.sha1.asc .
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 RUN apt-get update && apt-get install --no-install-recommends -y \
+       curl=7.64.0-4+deb10u1 \
        gnupg=2.2.12-1+deb10u1 \
        dirmngr=2.2.12-1+deb10u1 \
        unzip=6.0-23+deb10u1 \
@@ -43,6 +44,8 @@ ENV SOCKET_TIMEOUT_SECONDS 5
 ENV BIND_ADDRESS 0.0.0.0
 ENV PATH=/vnu-runtime-image/bin:$PATH
 EXPOSE 8888
+HEALTHCHECK --interval=1m --timeout=3s \
+  CMD curl -f http://localhost:8888/ || exit 1
 # hadolint ignore=DL3006
 FROM gcr.io/distroless/base
 COPY --from=builder /vnu-runtime-image /vnu-runtime-image
